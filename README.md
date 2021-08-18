@@ -1,6 +1,6 @@
-#######################
+#-----------------------------------
 # repositório tesePGMC
-#######################
+#-----------------------------------
 
 Neste repositório, guardo os códigos dos experimentos que realizei para elaboração de minha tese de Doutorado no Programa de Pós-Graduação em Modelagem Computacional, pela Universidade Federal de Juiz de Fora (UFJF).
 
