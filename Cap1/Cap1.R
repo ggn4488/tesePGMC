@@ -1,4 +1,4 @@
-# Tese - C√≥digos do Cap√≠tulo 1 --------------------------------------------
+# Tese - CÛdigos do CapÌtulo 1 --------------------------------------------
 
 #--------------------------------------------------
 # Carrega bibliotecas ----
@@ -16,7 +16,7 @@ library(weathermetrics)
 
 
 #--------------------------------------------------
-# Muda diret√≥rio de trabalho ----
+# Muda diretÛrio de trabalho ----
 #--------------------------------------------------
 
 setwd("C:/Users/Pc/Documents/PGMC 31-07-2020 on/Tese/Cap1")
@@ -31,7 +31,7 @@ font_add("lm10", regular = "lmroman10-regular.otf",
 showtext_auto()
 
 #--------------------------------------------------
-# Tema para os gr√°ficos ----
+# Tema para os gr·ficos ----
 #--------------------------------------------------
 tema_graficos_1 <- theme(axis.title.x = element_text(size=14, family="lm10", face = 'bold'),
   axis.title.y = element_text(size=20, family="lm10", face = 'bold'),
@@ -46,31 +46,31 @@ tema_graficos_1 <- theme(axis.title.x = element_text(size=14, family="lm10", fac
   legend.key = element_blank())
 
 #--------------------------------------------------
-# Fig. 1.2: Temperaturas globais anuais m√©dias e curva de tend√™ncia (obtida pelo m√©todo LOESS ----
+# Fig. 1.2: Temperaturas globais anuais mÈdias e curva de tendÍncia (obtida pelo mÈtodo LOESS ----
 #--------------------------------------------------
 
-# L√™ arquivo csv ----
+# LÍ arquivo csv ----
 
 global_temps <- read_delim("global-temperature.csv", " ", 
                  escape_double = FALSE, trim_ws = TRUE)
 
-# D√° nomes √†s colunas ----
+# D· nomes ‡s colunas ----
 
-colnames(global_temps) <- c('ano', 'm√©dia', 'tend√™ncia')
+colnames(global_temps) <- c('ano', 'mÈdia', 'tendÍncia')
 
 # Reescreve em formato tidy ----
 
-gt_tidy <- global_temps %>%  pivot_longer(m√©dia:tend√™ncia, 
+gt_tidy <- global_temps %>%  pivot_longer(mÈdia:tendÍncia, 
                                           names_to = "label", 
                                           values_to = "temp")
 # Remove o data frame antigo ----
 
 rm(global_temps)
 
-# Cria o gr√°fico em objeto ggplot ----
+# Cria o gr·fico em objeto ggplot ----
 
 fig1_2 <- ggplot(gt_tidy, aes(x = ano, y = temp, group = label)) +
-  labs(x = "Ano", y = "Temperatura global (¬∫C)", color = '') +
+  labs(x = "Ano", y = "Temperatura global (∫C)", color = '') +
   geom_line(aes(color = label), size=1.2) +
   scale_linetype_manual(values=c("dashed", "solid")) +
   scale_x_continuous(breaks=seq.int(1880,2020,20)) +
@@ -92,10 +92,10 @@ rm(fig1_2)
 rm(gt_tidy)
 
 #--------------------------------------------------
-# Fig. 1.3: Popula√ß√£o mundial entre 1950 e 2019 ----
+# Fig. 1.3: PopulaÁ„o mundial entre 1950 e 2019 ----
 #--------------------------------------------------
 
-# L√™ arquivo csv ----
+# LÍ arquivo csv ----
 
 pop_mundial <- read_delim("urbana-rural.csv", ";", 
                  escape_double = FALSE, trim_ws = TRUE)
@@ -113,15 +113,15 @@ rm(pop_mundial)
 
 pm_tidy <- pm_tidy %>% mutate(pop = pop/(10^6))
 
-# Filtra ano de 2007 para destacar no gr√°fico ----
+# Filtra ano de 2007 para destacar no gr·fico ----
 
 pm_2007 <- pm_tidy %>% 
   filter(Ano == 2007)
 
-# Cria o gr√°fico em objeto ggplot ----
+# Cria o gr·fico em objeto ggplot ----
 
 fig1_3 <- ggplot(pm_tidy, aes(x = Ano, y = pop, group = label)) +
-  labs(x = "Ano", y = "Popula√ß√£o mundial (bilh√µes)", color = '') +
+  labs(x = "Ano", y = "PopulaÁ„o mundial (bilhıes)", color = '') +
   geom_line(aes(color = label), size=1.05) + 
   geom_point(data=pm_2007, 
              aes(x=Ano,y=pop),
@@ -131,7 +131,7 @@ fig1_3 <- ggplot(pm_tidy, aes(x = Ano, y = pop, group = label)) +
   background_grid() +
   tema_graficos_1
 
-# Mostra o gr√°fico na tela ----
+# Mostra o gr·fico na tela ----
 
 fig1_3
 
@@ -145,15 +145,15 @@ rm(fig1_3)
 rm(pm_tidy)
 
 #--------------------------------------------------
-# Fig. 1.4: Cargas hor√°rias para tr√™s quartas-feiras seguidas (escolhidas por conveni√™ncia), sendo 29/08/1997 um feriado (dados da Eslov√°quia) ----
+# Fig. 1.4: Cargas hor·rias para trÍs quartas-feiras seguidas (escolhidas por conveniÍncia), sendo 29/08/1997 um feriado (dados da Eslov·quia) ----
 #--------------------------------------------------
 
-# L√™ arquivo xls e transp√µe ----
+# LÍ arquivo xls e transpıe ----
 
 eunite_97 <- read_excel("Load1997.xls")
 eunite_97 <- as.vector(t(as.matrix(eunite_97)))
 
-# Cria √≠ndices para os dias ----
+# Cria Ìndices para os dias ----
 
 index_dias <- c()
 
@@ -167,15 +167,15 @@ for(i in 1:365) {
 cargas <- data.frame(eunite_97, index_dias)
 colnames(cargas) <- c('carga', 'dia')
 
-# Cria √≠ndice para o feriado nacional da revolta da Eslov√°quia ----
+# Cria Ìndice para o feriado nacional da revolta da Eslov·quia ----
 
 feriado <- 241
 
-# Cria os √≠ndices para a amostra por conveni√™ncia ----
+# Cria os Ìndices para a amostra por conveniÍncia ----
 
 index_amostra <- c(feriado-7,feriado,feriado+7)
 
-# Faz a amostragem por conveni√™ncia ----
+# Faz a amostragem por conveniÍncia ----
 
 amostra_cargas <- cargas %>% 
                     filter(dia == index_amostra[1] | dia == index_amostra[2] | dia == index_amostra[3])
@@ -185,7 +185,7 @@ amostra_cargas <- amostra_cargas %>%
                                     mutate(dia = replace(dia, dia == index_amostra[2], '29/08/1997 (feriado)')) %>% 
                                       mutate(dia = replace(dia, dia == index_amostra[3], '05/09/1997'))
 
-# Cria √≠ndices para as horas do dia ----
+# Cria Ìndices para as horas do dia ----
 
 index_horas <- c()
 
@@ -211,7 +211,7 @@ colnames(eunite_tidy) <- c('Hora', 'Carga', 'Dia')
 
 eunite_tidy$Dia <- factor(eunite_tidy$Dia, levels= c("22/08/1997", "29/08/1997 (feriado)", "05/09/1997"))
 
-# Remove objetos que n√£o ser√£o mais usados ----
+# Remove objetos que n„o ser„o mais usados ----
 
 rm(a)
 rm(eunite_97)
@@ -224,7 +224,7 @@ rm(vetor_horas)
 rm(amostra_cargas)
 rm(cargas)
 
-# Cria o gr√°fico em objeto ----
+# Cria o gr·fico em objeto ----
 
 fig1_4 <- ggplot(eunite_tidy, aes(x = Hora, y = Carga, group = Dia)) +
   labs(x = "Hora do dia", y = "Carga (MW)", color = '') +
@@ -234,7 +234,7 @@ fig1_4 <- ggplot(eunite_tidy, aes(x = Hora, y = Carga, group = Dia)) +
   background_grid() +
   tema_graficos_1
 
-# Mostra o gr√°fico na tela ----
+# Mostra o gr·fico na tela ----
 
 print(fig1_4)
 
@@ -248,14 +248,14 @@ rm(fig1_4)
 rm(eunite_tidy)
 
 #--------------------------------------------------
-# Fig. 1.5: Cargas hor√°rias para tr√™s quartas-feiras seguidas (escolhidas por conveni√™ncia), sendo 29/08/1997 um feriado (dados da Eslov√°quia) ----
+# Fig. 1.5: Cargas hor·rias para trÍs quartas-feiras seguidas (escolhidas por conveniÍncia), sendo 29/08/1997 um feriado (dados da Eslov·quia) ----
 #--------------------------------------------------
-# L√™ arquivo xls e transp√µe ----
+# LÍ arquivo xls e transpıe ----
 
 eunite_97 <- read_excel("Load1997.xls")
 eunite_97 <- as.vector(t(as.matrix(eunite_97)))
 
-# Cria √≠ndices para os dias ----
+# Cria Ìndices para os dias ----
 
 index_dias <- c()
 
@@ -269,20 +269,20 @@ for(i in 1:365) {
 cargas <- data.frame(eunite_97, index_dias)
 colnames(cargas) <- c('carga', 'dia')
 
-# Cria √≠ndice para o feriado nacional da revolta da Eslov√°quia ----
+# Cria Ìndice para o feriado nacional da revolta da Eslov·quia ----
 
 feriado <- 241
 
-# Cria os √≠ndices para a amostra por conveni√™ncia ----
+# Cria os Ìndices para a amostra por conveniÍncia ----
 
 index_amostra <- c(feriado-7,feriado,feriado+7)
 
-# Faz a amostragem por conveni√™ncia ----
+# Faz a amostragem por conveniÍncia ----
 
 amostra_cargas <- cargas %>% 
   filter(dia == index_amostra[1] | dia == index_amostra[2] | dia == index_amostra[3])
 
-# Imputa√ß√£o de dados no lugar do feriado ----
+# ImputaÁ„o de dados no lugar do feriado ----
 
 amostra_cargas <- amostra_cargas %>% 
   mutate(dia = replace(dia, dia == index_amostra[1], '22/08/1997')) %>% 
@@ -296,7 +296,7 @@ for(i in 49:96) {
 }
 amostra_cargas$dia[145:192] <- "29/08/1997 (feriado)"
 
-# Cria √≠ndices para as horas do dia ----
+# Cria Ìndices para as horas do dia ----
 
 index_horas <- c()
 
@@ -322,7 +322,7 @@ colnames(eunite_tidy) <- c('Hora', 'Carga', 'Dia')
 
 eunite_tidy$Dia <- factor(eunite_tidy$Dia, levels= c("22/08/1997", "29/08/1997 (feriado)", "05/09/1997", "dados imputados"))
 
-# Remove objetos que n√£o ser√£o mais usados ----
+# Remove objetos que n„o ser„o mais usados ----
 
 rm(a)
 rm(eunite_97)
@@ -335,7 +335,7 @@ rm(vetor_horas)
 rm(amostra_cargas)
 rm(cargas)
 
-# Cria o gr√°fico em objeto ----
+# Cria o gr·fico em objeto ----
 
 fig1_5 <- ggplot(eunite_tidy, aes(x = Hora, y = Carga)) +
   labs(x = "Hora do dia", y = "Carga (MW)", color = '', linetype='') +
@@ -361,14 +361,14 @@ rm(eunite_tidy)
 rm(fig1_5)
 
 #--------------------------------------------------
-# Fig. 1.6: Cargas hor√°rias para duas semanas de inverno e duas de ver√£o (escolhidas por conveni√™ncia; dados da Eslov√°quia) ----
+# Fig. 1.6: Cargas hor·rias para duas semanas de inverno e duas de ver„o (escolhidas por conveniÍncia; dados da Eslov·quia) ----
 #--------------------------------------------------
-# L√™ arquivo xls e transp√µe ----
+# LÍ arquivo xls e transpıe ----
 
 eunite_97 <- read_excel("Load1997.xls")
 eunite_97 <- as.vector(t(as.matrix(eunite_97)))
 
-# Cria √≠ndices para os dias ----
+# Cria Ìndices para os dias ----
 
 index_dias <- c()
 
@@ -382,20 +382,20 @@ for(i in 1:365) {
 cargas <- data.frame(eunite_97, index_dias)
 colnames(cargas) <- c('carga', 'dia')
 
-# Cria √≠ndices para os per√≠odos quente e frio ----
+# Cria Ìndices para os perÌodos quente e frio ----
 
 #13/01/1997 (inverno) 15
-#07/07/1997 (ver√£o) 188
+#07/07/1997 (ver„o) 188
 
 index_quente <- 13
 index_frio  <- 188
 
-# Cria √≠ndices para a amostra por conveni√™ncia ----
+# Cria Ìndices para a amostra por conveniÍncia ----
 
 index_amostra <- c(index_quente:(index_quente+13), index_frio:(index_frio+13))
 
 
-# Faz a amostragem por conveni√™ncia ----
+# Faz a amostragem por conveniÍncia ----
 
 amostra_cargas <- cargas %>% 
   filter(dia %in% index_amostra)
@@ -406,9 +406,9 @@ index_hora <- c(1:672, 1:672)
 
 eunite_tidy <- data.frame(index_hora, amostra_cargas)
 
-eunite_tidy$dia <- c(rep('Semana de Inverno', 672), rep('Semana de Ver√£o', 672))
+eunite_tidy$dia <- c(rep('Semana de Inverno', 672), rep('Semana de Ver„o', 672))
 
-# Remove objetos que n√£o ser√£o mais usados ----
+# Remove objetos que n„o ser„o mais usados ----
 
 rm(a)
 rm(eunite_97)
@@ -447,13 +447,13 @@ rm(fig1_6)
 rm(eunite_tidy)
 
 #--------------------------------------------------
-# Fig. 1.7: Cargas m√©dias di√°rias para no ano de 1997 (escolhido por conveni√™ncia; dados da Eslov√°quia)] { - Cargas m√©dias di√°rias para no ano de 1997 (escolhido por conveni√™ncia; dados da Eslov√°quia)
+# Fig. 1.7: Cargas mÈdias di·rias para no ano de 1997 (escolhido por conveniÍncia; dados da Eslov·quia)] { - Cargas mÈdias di·rias para no ano de 1997 (escolhido por conveniÍncia; dados da Eslov·quia)
 #--------------------------------------------------
-# L√™ arquivo xls ----
+# LÍ arquivo xls ----
 
 eunite_97 <- read_excel("Load1997.xls")
 
-# Calcula m√©dias di√°rias ----
+# Calcula mÈdias di·rias ----
 
 medias <- rowMeans(eunite_97)
 
@@ -462,7 +462,7 @@ medias <- rowMeans(eunite_97)
 eunite_medias <- data.frame(medias, 1:365)
 colnames(eunite_medias) <- c('carga', 'dia')
 
-# Remove objetos que n√£o ser√£o mais utilizados ----
+# Remove objetos que n„o ser„o mais utilizados ----
 
 rm(eunite_97)
 rm(medias)
@@ -470,7 +470,7 @@ rm(medias)
 # Cria objeto com a figura ----
 
 fig1_7 <- ggplot(eunite_medias, aes(x = dia, y = carga)) +
-  labs(x = "M√™s do ano", y = "Carga m√©dia di√°ria (MW)", color = '') +
+  labs(x = "MÍs do ano", y = "Carga mÈdia di·ria (MW)", color = '') +
   geom_line() + 
   background_grid() +
   tema_graficos_1 +
@@ -490,14 +490,14 @@ rm(fig1_7)
 rm(eunite_medias)
 
 #--------------------------------------------------
-# Fig. 1.8: Cargas m√©dias di√°rias versus temperaturas m√©dias di√°rias (dados de Puget Sound) ---
+# Fig. 1.8: Cargas mÈdias di·rias versus temperaturas mÈdias di·rias (dados de Puget Sound) ---
 #--------------------------------------------------
 # Carrega arquivos xls ----
 
 cargas <- read_excel("sharkawi-loads-mean.xlsx")
 temps  <- read_excel("sharkawi-temps-mean.xlsx")
 
-# Converte temperaturas de F¬∫ para C¬∫
+# Converte temperaturas de F∫ para C∫
 
 temps <- temps*10
 temps <- fahrenheit.to.celsius(temps, round = 2)
@@ -508,20 +508,20 @@ puget <- data.frame(cargas, temps)
 
 colnames(puget) <- c('Carga', 'Temp')
 
-# Remove objetos que n√£o ser√£o mais usados ----
+# Remove objetos que n„o ser„o mais usados ----
 
 rm(cargas)
 rm(temps)
 
-# Cria objeto com o gr√°fico ----
+# Cria objeto com o gr·fico ----
 
 fig1_8 <- ggplot(puget, aes(x = Temp, y = Carga)) +
-  labs(x = "Temperatura m√©dia di√°ria (¬∫C)", y = "Carga m√©dia di√°ria (MW)", color = '') +
+  labs(x = "Temperatura mÈdia di·ria (∫C)", y = "Carga mÈdia di·ria (MW)", color = '') +
   geom_point(size=.5) +
   background_grid() +
   tema_graficos_1
 
-# Mostra gr√°fico na tela ----
+# Mostra gr·fico na tela ----
 
 print(fig1_8)
 
