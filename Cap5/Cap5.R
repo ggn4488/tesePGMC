@@ -1,127 +1,123 @@
-setwd("C:/Users/Pc/Documents/PGMC 31-07-2020 on/Tese/Cap2")
+# Tese - Códigos do Capítulo 5 --------------------------------------------
 
+#--------------------------------------------------
+# Carrega bibliotecas ----
+#--------------------------------------------------
 library(readr)
 library(ggplot2)
 library(cowplot)
 library(showtext)
 library(scales)
-library("tidyverse")
-library("TTR")
+library(tidyverse)
+library(TTR)
+library(plyr)
+library(MLmetrics)
 
-df_loads <- read_delim("loadsny1518.csv", ",")
-df_loads <- df_loads[1:35040,]
+#--------------------------------------------------
+# Muda diretório de trabalho ----
+#--------------------------------------------------
+setwd("C:/Users/Pc/Documents/GitHub/tesePGMC/Cap2")
 
-dfl <- aggregate(cbind(WEST, GENESE, CENTRL, NORTH, MHKVL, CAPITL) ~ day + season, data = df_loads, FUN = mean, na.rm = TRUE)
-# there are days in which there are two seasons
-
-df_temps <- read_delim("tempsny1518.csv", ",")
-df_temps <- df_temps[1:35040,]
-
-df_temps$season <- df_loads$season
-df_temps$day <- df_loads$day
-
-dft <- aggregate(cbind(ALB, ART, BGM, BUF, HPN, JFK, LGA, MSS, RME, ROC, SYR) ~ day + season, data = df_temps, FUN = mean, na.rm = TRUE)
-# there are days in which there are two seasons
-
-dflt <- cbind(dfl, dft[,3:13])
-
-library("plyr")
-dflt$season <- factor(dflt$season)
-dflt$season <- revalue(dflt$season, c("1" = "Primavera", "2"="Verão", "3" = "Outono", "4"="Inverno"))
-
-dflt <- filter(dflt, season == "Primavera")
-
-dflt <- dflt[sample(nrow(dflt), 30), ]
-
-write.csv(dflt, "dflt.csv")
-
-ggplot(dflt, aes(x = BUF, y = WEST)) +
-  labs(x = "Temperatura média diária (ºC)", y = "Carga média diária (MW)") +
-  geom_point(alpha = 0.8, size = 2.5) + 
-  theme(axis.title.x = element_text(size=18, family="lm10", face = 'bold')) +
-  theme(axis.title.y = element_text(size=18, family="lm10", face = 'bold')) +
-  theme(axis.text.x = element_text(size=18,family="lm10")) +
-  theme(axis.text.y = element_text(size=18, family="lm10")) +
-  theme(legend.text = element_text(size=18, family="lm10")) +
-  theme(legend.title = element_text(size=0, family="lm10")) + 
-  theme(
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor.x = element_blank()
-  ) +
-  theme(panel.background = element_blank()) + 
-  theme(axis.line = element_line(size = 1)) +
-  theme(legend.key = element_blank())
+#--------------------------------------------------
+# Adiciona fontes ----
+#--------------------------------------------------
 
 font_add("lm10", regular = "lmroman10-regular.otf",
          bold = "lmroman10-Bold.otf")
+
 showtext_auto()
 
-model <- lm(WEST~BUF, data = dflt)
+#--------------------------------------------------
+# Tema para os gráficos ----
+#--------------------------------------------------
+tema_graficos_1 <- theme(axis.title.x = element_text(size=14, family="lm10", face = 'bold'),
+                         axis.title.y = element_text(size=20, family="lm10", face = 'bold'),
+                         axis.line = element_line(size = 1),
+                         axis.text.x = element_text(size=12, family="lm10"),
+                         axis.text.y = element_text(size=12, family="lm10"),
+                         legend.text = element_text(size=12, family="lm10"),
+                         legend.title = element_text(size=0, family="lm10"),
+                         panel.grid.major.x = element_blank(),
+                         panel.grid.minor.x = element_blank(),
+                         panel.background = element_blank(), 
+                         legend.key = element_blank())
 
-dflt$line <- predict(model, data.frame(dflt))
+#------------------------------------------------------------------------------
+# Fig. 5.1: Diagrama de dispersão carga x temperatura (médias) para WEST e BUF ----
+#------------------------------------------------------------------------------
 
-ggplot(dflt, aes(x = BUF, y = WEST)) +
-  geom_line(aes(x = BUF, y = line)) +
+cargas <- read_delim("cargas_ny_1518_untidy.csv", ",")
+
+colnames(cargas)[6] <- 'MHKVL'
+colnames(cargas)[8] <- 'HUDVL'
+
+cargas_medias <- aggregate(cbind(WEST, GENESE, CENTRL, NORTH, MHKVL, CAPITL, HUDVL) ~ Dias + Estacao, data = cargas, FUN = mean, na.rm = TRUE)
+
+temps <- read_delim("temps_ny_1518_untidy.csv", ",")
+
+temps$Estacao <- cargas$Estacao
+temps$Dias <- cargas$Dias
+
+temps_medias <- aggregate(cbind(ALB, ART, BGM, BUF, ELM, HPN, JFK, LGA, MSS, MSV, PBG, POU, RME, ROC, SYR, SWF) ~ Dias + Estacao, data = temps, FUN = mean, na.rm = TRUE)
+
+cargas_temps <- cbind(cargas_medias, temps_medias[,3:18])
+
+cargas_temps$Estacao <- factor(cargas_temps$Estacao)
+cargas_temps$Estacao <- revalue(cargas_temps$Estacao, c("1" = "Primavera", "2"="Verão", "3" = "Outono", "4"="Inverno"))
+
+cargas_temps <- cargas_temps %>% filter(Estacao == "Primavera")
+
+set.seed(123)
+
+index <- sample(1:(nrow(cargas_temps)-1), size=1)
+amostra_treino <- cargas_temps[index:(index+29), ]
+
+fig5_1 <- ggplot(amostra_treino, aes(x = BUF, y = WEST)) +
+  labs(x = "Temperatura média diária (ºC)", y = "Carga média diária (MW)") +
+  geom_point(alpha = 0.8, size = 2.5) +
+  tema_graficos_1
+
+print(fig5_1)
+
+dev.off()
+
+#------------------------------------------------------------------------------
+# Fig. 5.2: Regressão linear ----
+#------------------------------------------------------------------------------
+modelo_rl <- lm(WEST~BUF, data = amostra_treino)
+
+amostra_treino$reta <- predict(modelo_rl, data.frame(amostra_treino))
+
+fig5_2 <- ggplot(amostra_treino, aes(x = BUF, y = WEST)) +
+  geom_line(aes(x = BUF, y = reta)) +
   labs(x = "Temperatura média diária (ºC)", y = "Carga média diária (MW)") +
   geom_point(alpha = 0.8, size = 2.5) + 
-  geom_segment(aes(xend= BUF,yend=line), linetype = "dashed" , show.legend=T) +
-  theme(axis.title.x = element_text(size=18, family="lm10", face = 'bold')) +
-  theme(axis.title.y = element_text(size=18, family="lm10", face = 'bold')) +
-  theme(axis.text.x = element_text(size=18,family="lm10")) +
-  theme(axis.text.y = element_text(size=18, family="lm10")) +
-  theme(legend.text = element_text(size=18, family="lm10")) +
-  theme(legend.title = element_text(size=0, family="lm10")) + 
-  theme(
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor.x = element_blank()
-  ) +
-  theme(panel.background = element_blank()) + 
-  theme(axis.line = element_line(size = 1)) +
-  theme(legend.key = element_blank())
+  geom_segment(aes(xend= BUF,yend=reta), linetype = "dashed" , show.legend=T) +
+  tema_graficos_1
 
-model2 <- lm(WEST ~ I(BUF^1) + I(BUF^2) + I(BUF^3) + I(BUF^4) + I(BUF^5) + I(BUF^6) +I(BUF^7), data = dflt)
+print(fig5_2)
 
-dflt$poly <- predict(model2,data.frame(dflt))
+dev.off()
 
-ggplot(dflt, aes(x = BUF, y = WEST, color = variable)) +
-  geom_line(aes(x = BUF, y = poly)) +
+mape_rl1 <- MAPE(amostra_treino$reta, amostra_treino$WEST)*100
+
+#------------------------------------------------------------------------------
+# Fig. 5.3: Regressão polinomial ----
+#------------------------------------------------------------------------------
+
+modelo_rl_2 <- lm(WEST ~ I(BUF^1) + I(BUF^2) + I(BUF^3) + I(BUF^4) + I(BUF^5) + I(BUF^6) +I(BUF^7), data = amostra_treino)
+
+amostra_treino$polinomio <- predict(modelo_rl_2,data.frame(amostra_treino))
+
+fig5_3 <- ggplot(amostra_treino, aes(x = BUF, y = WEST)) +
+  geom_line(aes(x = BUF, y = polinomio)) +
   labs(x = "Temperatura média diária (ºC)", y = "Carga média diária (MW)") +
   geom_point(alpha = 0.8, size = 2.5) + 
-  geom_segment(aes(xend= BUF,yend=poly), linetype = "dashed" , show.legend=T) +
-  theme(axis.title.x = element_text(size=18, family="lm10", face = 'bold')) +
-  theme(axis.title.y = element_text(size=18, family="lm10", face = 'bold')) +
-  theme(axis.text.x = element_text(size=18,family="lm10")) +
-  theme(axis.text.y = element_text(size=18, family="lm10")) +
-  theme(legend.text = element_text(size=18, family="lm10")) +
-  theme(legend.title = element_text(size=0, family="lm10")) + 
-  theme(
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor.x = element_blank()
-  ) +
-  theme(panel.background = element_blank()) + 
-  theme(axis.line = element_line(size = 1)) +
-  
+  geom_segment(aes(xend= BUF,yend=polinomio), linetype = "dashed" , show.legend=T) +
+  tema_graficos_1
 
+print(fig5_3)
 
-library(ggplot2)
-library(showtext)
+mape_rl2 <- MAPE(amostra_treino$polinomio, amostra_treino$WEST)*100
 
-
-
-ggplot(data = d, aes(x = , y = y)) +
-  geom_point(color = "#003f5c", size = 3) +
-  geom_line(aes(x = X, y = poly)) +
-  #geom_segment(aes(xend=X,yend=line), linetype = "dashed" , show.legend=T) +
-  theme(axis.title.x = element_text(size=18, family="lm10", face = 'bold')) +
-  theme(axis.title.y = element_text(size=18, family="lm10", face = 'bold')) +
-  theme(axis.text.x = element_text(size=0,family="lm10")) +
-  theme(axis.text.y = element_text(size=18, family="lm10")) +
-  theme(legend.text = element_text(size=18, family="lm10")) +
-  theme(legend.title = element_text(size=0, family="lm10")) + 
-  theme(
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor.x = element_blank()
-  ) +
-  theme(axis.ticks.x = element_blank()) +
-  theme(panel.background = element_blank()) + 
-  theme(axis.line = element_line(size = 1))
+dev.off()
