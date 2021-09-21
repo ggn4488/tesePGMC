@@ -6,6 +6,7 @@
 #--------------------------------------------------
 # Carrega bibliotecas ----
 #--------------------------------------------------
+library(readr)
 library(data.table)
 library(dplyr)
 library(lubridate)

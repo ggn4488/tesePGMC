@@ -5,6 +5,7 @@
 #--------------------------------------------------
 # Carrega bibliotecas ----
 #--------------------------------------------------
+library(readr)
 library(tidyr)
 library(dplyr)
 library(lubridate)
@@ -192,6 +193,7 @@ deletar <- c()
 for(i in 1:nrow(df_untidy)) {
   for(j in 1:nrow(lista_dst)) {
     if(df_untidy$Time[i] == lista_dst$Tempo[j]) {
+      print(df_untidy$Time[i])
       if(lista_dst$Dst[j] == "fim") {
         
         df_untidy[i-2,2:12] <- (df_untidy[i-2, 2:12] + df_untidy[i-1, 2:12])/2
@@ -202,31 +204,22 @@ for(i in 1:nrow(df_untidy)) {
   }
 }
 
-
 df_untidy <- df_untidy[-deletar,]
 
 # Correção onde é necessário adiantar o relógio
 
-acrescentar <- c()
+acrescentar <- which(df_untidy$Time %in% lista_dst$Tempo[which(lista_dst$Dst == 'inicio')])
 
-for(i in 1:nrow(df_untidy)) {
-  for(j in 1:nrow(lista_dst)) {
-    if(df_untidy$Time[i] == lista_dst$Tempo[j]) {
-      if(lista_dst$Dst[j] == "inicio") {
-        
-        acrescentar <- c(acrescentar, i)
-
-      }
-    }
-  }
-}
-
-for(i in acrescentar) {
+for(k in 1:4) {
+  index <- acrescentar[k]
+  df_untidy <- InsertRow(df_untidy, NewRow = df_untidy[index,], RowNum = index)
+  df_untidy[index + 1,2:12] <- (df_untidy[index,2:12] + df_untidy[index + 2,2:12])/2
+  df_untidy$Time[index+1] <- str_replace(df_untidy$Time[index+1], "01:00:00$", "02:00:00")
+  df_untidy$Hora[index+1] <- df_untidy$Hora[index] + 1
   
-  df_untidy <- InsertRow(df_untidy, NewRow = df_untidy[i,], RowNum = i)
-  df_untidy[i + 1,2:12] <- (df_untidy[i,2:12] + df_untidy[i + 2,2:12])/2
-  df_untidy$Time[i+1] <- str_replace(df_untidy$Time[i+1], "01:00:00$", "02:00:00")
+  acrescentar <- which(df_untidy$Time %in% lista_dst$Tempo[which(lista_dst$Dst == 'inicio')])
 }
+
 
 #--------------------------------------------------------------
 # Inclui índice para o dia na base de dados ----
@@ -243,7 +236,6 @@ df_untidy <- df_untidy[-1,]
 df_untidy <- rbind(df_untidy, df_untidy[nrow(df_untidy),])
 df_untidy$Dias <- Dias
 
-
 #--------------------------------------------------------------
 # Remove a primeira observação e imputa a última ----
 #--------------------------------------------------------------
@@ -257,7 +249,7 @@ df_untidy$Hora[nrow(df_untidy)] <- 24
 
 df_untidy$Tendencia[nrow(df_untidy)] <- df_untidy$Tendencia[nrow(df_untidy)-1] + 1
 
-df_untidy$Tendencia <- df_untidy$Tendencia - 1
+df_untidy$Tendencia <- 1:nrow(df_untidy)
 
 #--------------------------------------------------------------
 # Gera Data Frame tidy ----
