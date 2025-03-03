@@ -12,9 +12,6 @@ Na tese, abordo o problema da combinação de estações meteorológicas para pr
 
 Os códigos, escritos em linguagens R e Python, estão separados por capítulo.
 
-ATENÇÃO: até o momento, o texto ainda não foi depositado, e nem todos os códigos estão no repositório. Atualizarei sempre que fizer modificações.
-
-
 
 
 
